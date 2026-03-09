@@ -10,7 +10,7 @@ from app.agents.utils.prompt_templates import EVAL_COMPARE_INSTRUCTION
 
 logger = logging.getLogger(__name__)
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = "gemini-2.5-flash"
 _APP_NAME = "daef_compare"
 
 
@@ -45,7 +45,6 @@ eval_compare_agent = LlmAgent(
     disallow_transfer_to_parent=True,
     generate_content_config=GenerateContentConfig(
         temperature=0.1,
-        max_output_tokens=1500,
     ),
 )
 

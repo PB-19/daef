@@ -7,7 +7,7 @@ from app.agents.utils.prompt_templates import EVAL_RESEARCH_INSTRUCTION
 
 logger = logging.getLogger(__name__)
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = "gemini-2.5-flash"
 
 eval_research_agent = LlmAgent(
     name="EvalResearchAgent",
@@ -24,7 +24,6 @@ eval_research_agent = LlmAgent(
     disallow_transfer_to_parent=True,
     generate_content_config=GenerateContentConfig(
         temperature=0.1,
-        max_output_tokens=900,
     ),
 )
 

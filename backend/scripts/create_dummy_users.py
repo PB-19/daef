@@ -9,6 +9,9 @@ import logging
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+
 from app.core.logging import setup_logging
 from app.database.base import async_session_maker
 from app.database.init_db import init_db
@@ -21,11 +24,11 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 DUMMY_USERS = [
-    {"email": "alice@daef.dev", "username": "alice", "full_name": "Alice Chen", "password": "Password123!"},
-    {"email": "bob@daef.dev", "username": "bob", "full_name": "Bob Smith", "password": "Password123!"},
-    {"email": "charlie@daef.dev", "username": "charlie", "full_name": "Charlie Park", "password": "Password123!"},
-    {"email": "diana@daef.dev", "username": "diana", "full_name": "Diana Patel", "password": "Password123!"},
-    {"email": "evan@daef.dev", "username": "evan", "full_name": "Evan Torres", "password": "Password123!"},
+    {"email": "alice@example.com", "username": "alice", "full_name": "Alice Chen", "password": "alice123@"},
+    {"email": "bob@example.com", "username": "bob", "full_name": "Bob Smith", "password": "bob123@"},
+    {"email": "charlie@example.com", "username": "charlie", "full_name": "Charlie Park", "password": "charlie123@"},
+    {"email": "diana@example.com", "username": "diana", "full_name": "Diana Patel", "password": "diana123@"},
+    {"email": "evan@example.com", "username": "evan", "full_name": "Evan Torres", "password": "evan123@"},
 ]
 
 

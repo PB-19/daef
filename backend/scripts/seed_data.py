@@ -11,6 +11,9 @@ import logging
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+
 from decimal import Decimal
 from sqlalchemy import select
 

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db
@@ -18,6 +19,16 @@ async def register(user_data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(credentials: UserLogin, db: AsyncSession = Depends(get_db)):
+    return await auth_service.login_user(credentials, db)
+
+
+@router.post("/token", response_model=TokenResponse, include_in_schema=False)
+async def swagger_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    # Swagger UI Authorize uses form fields: username = email, password = password
+    credentials = UserLogin(email=form_data.username, password=form_data.password)
     return await auth_service.login_user(credentials, db)
 
 

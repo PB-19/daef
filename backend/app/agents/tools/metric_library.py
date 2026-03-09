@@ -1,6 +1,5 @@
 import logging
 from google.adk.tools import FunctionTool
-from google.adk.tools.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 
@@ -274,7 +273,6 @@ async def get_candidate_metrics(
     task_type: str,
     focus_areas: list[str],
     domain: str,
-    ctx: ToolContext,
 ) -> dict:
     """Return candidate evaluation metrics for a given task type, focus areas, and domain.
 
@@ -282,7 +280,6 @@ async def get_candidate_metrics(
         task_type: One of 'rag', 'tuning', 'single_call'.
         focus_areas: List of selected focus areas (up to 3).
         domain: The domain string (e.g. 'Healthcare', 'Legal').
-        ctx: ADK tool context (injected automatically).
 
     Returns:
         A dict with key 'metrics' containing a list of candidate metric dicts.
@@ -332,7 +329,6 @@ async def get_candidate_metrics(
     ]
 
     logger.debug("Metric library returned %d candidates for task_type=%s domain=%s", len(clean), task_type, domain)
-    ctx.state["temp:metric_candidates"] = clean
     return {"metrics": clean}
 
 

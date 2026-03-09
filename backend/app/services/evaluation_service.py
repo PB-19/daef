@@ -34,6 +34,8 @@ async def create_evaluation(data: EvaluationCreate, user_id: str, db: AsyncSessi
     )
     db.add(evaluation)
     await db.flush()
+    await db.refresh(evaluation)
+    await db.commit()
     logger.info("Evaluation created: %s for user %s", evaluation.id, user_id)
     return evaluation
 
@@ -104,6 +106,8 @@ async def retry_evaluation(evaluation_id: str, user_id: str, db: AsyncSession) -
     evaluation.error_message = None
     db.add(evaluation)
     await db.flush()
+    await db.refresh(evaluation)
+    await db.commit()
     logger.info("Evaluation %s queued for retry #%d", evaluation_id, evaluation.retry_count + 1)
     return evaluation
 
@@ -292,6 +296,8 @@ async def create_comparison(
     )
     db.add(version)
     await db.flush()
+    await db.refresh(version)
+    await db.commit()
     logger.info("Comparison version created: %s", version.id)
     return version
 

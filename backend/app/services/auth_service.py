@@ -29,6 +29,7 @@ async def register_user(data: UserRegister, db: AsyncSession) -> User:
     )
     db.add(user)
     await db.flush()
+    await db.refresh(user)
     logger.info("User registered: %s", user.email)
     return user
 

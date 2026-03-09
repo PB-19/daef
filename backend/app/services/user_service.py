@@ -30,5 +30,6 @@ async def update_user(user: User, data: UserUpdate, db: AsyncSession) -> User:
 
     db.add(user)
     await db.flush()
+    await db.refresh(user)
     logger.info("User profile updated: %s", user.id)
     return user

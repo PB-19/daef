@@ -41,6 +41,7 @@ async def create_post(data: SocialPostCreate, user_id: str, db: AsyncSession) ->
     )
     db.add(post)
     await db.flush()
+    await db.refresh(post)
     logger.info("Social post created: %s", post.id)
     return post
 
@@ -152,6 +153,7 @@ async def like_post(post_id: str, user_id: str, db: AsyncSession) -> Like:
     post.likes_count += 1
     db.add(post)
     await db.flush()
+    await db.refresh(like)
     logger.debug("Post %s liked by %s", post_id, user_id)
     return like
 
@@ -186,6 +188,7 @@ async def create_comment(post_id: str, data: CommentCreate, user_id: str, db: As
     post.comments_count += 1
     db.add(post)
     await db.flush()
+    await db.refresh(comment)
 
     user_result = await db.execute(select(User.username).where(User.id == user_id))
     username = user_result.scalar_one_or_none() or ""
