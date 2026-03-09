@@ -41,9 +41,21 @@ Thumbs.db
 frontend/.dart_tool/
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
+frontend/.pub-cache/
+frontend/.pub/
 frontend/build/
 frontend/.packages
 frontend/pubspec.lock
+frontend/coverage/
+frontend/*.iml
+frontend/*.ipr
+frontend/*.iws
+frontend/.idea/
+frontend/app.*.symbols
+frontend/app.*.map.json
+frontend/android/app/debug
+frontend/android/app/profile
+frontend/android/app/release
 
 # Docker
 *.env.docker
