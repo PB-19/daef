@@ -23,6 +23,7 @@ async def compare_evaluations(
         comparison_data.base_evaluation_id,
         comparison_data.new_evaluation_id,
         version.id,
+        current_user.id,
     )
     return version
 

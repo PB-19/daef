@@ -124,20 +124,15 @@ async def process_evaluation(evaluation_id: str) -> None:
             db.add(evaluation)
             await db.commit()
 
-            # TODO: Wire ADK agent pipeline here in agents phase
-            # from app.agents.orchestrator import run_evaluation_pipeline
-            # pipeline_result = await run_evaluation_pipeline(evaluation)
-            # await _save_evaluation_results(evaluation, pipeline_result, db)
-            raise NotImplementedError("Agent pipeline not yet wired")
+            from app.agents.orchestrator import run_evaluation_pipeline
+            pipeline_result = await run_evaluation_pipeline(evaluation)
 
-        except NotImplementedError:
             result = await db.execute(select(Evaluation).where(Evaluation.id == evaluation_id))
             evaluation = result.scalar_one_or_none()
-            if evaluation:
-                evaluation.status = EvaluationStatus.FAILED
-                evaluation.error_message = "Agent pipeline not yet implemented"
-                db.add(evaluation)
-                await db.commit()
+            await _save_evaluation_results(evaluation, pipeline_result, db)
+            await db.commit()
+            logger.info("Evaluation %s completed successfully, score=%.2f", evaluation_id, pipeline_result.get("overall_score", 0))
+
         except Exception as exc:
             logger.error("Evaluation processing failed for %s: %s", evaluation_id, exc, exc_info=True)
             async with async_session_maker() as err_db:
@@ -179,17 +174,74 @@ async def _save_evaluation_results(
 
 # ── Background task: run comparison pipeline ──────────────────────────────────
 
+async def _build_eval_dict_for_comparison(evaluation_id: str, db: AsyncSession) -> dict:
+    result = await db.execute(select(Evaluation).where(Evaluation.id == evaluation_id))
+    evaluation = result.scalar_one_or_none()
+    if not evaluation:
+        raise ValueError(f"Evaluation {evaluation_id} not found")
+
+    metrics_result = await db.execute(
+        select(EvaluationMetric).where(EvaluationMetric.evaluation_id == evaluation_id)
+    )
+    metrics = [
+        {
+            "metric_name": m.metric_name,
+            "metric_category": m.metric_category,
+            "score": float(m.score) if m.score is not None else None,
+            "max_score": float(m.max_score) if m.max_score is not None else 100.0,
+            "weight": float(m.weight) if m.weight is not None else None,
+            "reasoning": m.reasoning,
+        }
+        for m in metrics_result.scalars().all()
+    ]
+
+    return {
+        "id": evaluation.id,
+        "domain": evaluation.domain,
+        "task_type": evaluation.task_type,
+        "overall_score": float(evaluation.overall_score) if evaluation.overall_score is not None else None,
+        "evaluation_report": evaluation.evaluation_report,
+        "agent_insights": evaluation.agent_insights,
+        "metrics": metrics,
+    }
+
+
 async def process_comparison(
     base_evaluation_id: str,
     new_evaluation_id: str,
     version_id: str,
+    user_id: str,
 ) -> None:
     async with async_session_maker() as db:
         try:
-            # TODO: Wire EvalCompareAgent here in agents phase
-            raise NotImplementedError("Comparison agent not yet wired")
-        except NotImplementedError:
-            logger.warning("Comparison %s: agent not yet implemented", version_id)
+            base_dict = await _build_eval_dict_for_comparison(base_evaluation_id, db)
+            new_dict = await _build_eval_dict_for_comparison(new_evaluation_id, db)
+
+            from app.agents.eval_compare import run_comparison_pipeline
+            comparison_result = await run_comparison_pipeline(
+                base_evaluation=base_dict,
+                new_evaluation=new_dict,
+                user_id=user_id,
+                session_id=f"compare_{version_id}",
+            )
+
+            version_result = await db.execute(
+                select(EvaluationVersion).where(EvaluationVersion.id == version_id)
+            )
+            version = version_result.scalar_one_or_none()
+            if version:
+                version.comparison_report = comparison_result
+                overall_change = comparison_result.get("overall_change", "similar")
+                if overall_change == "better":
+                    version.performance_change = PerformanceChange.BETTER
+                elif overall_change == "worse":
+                    version.performance_change = PerformanceChange.WORSE
+                else:
+                    version.performance_change = PerformanceChange.SIMILAR
+                db.add(version)
+                await db.commit()
+                logger.info("Comparison %s completed: %s", version_id, overall_change)
+
         except Exception as exc:
             logger.error("Comparison processing failed for version %s: %s", version_id, exc, exc_info=True)
 
