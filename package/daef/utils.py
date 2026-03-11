@@ -20,10 +20,8 @@ def parse_agent_json(raw: Any, field_name: str) -> Any:
         try:
             cleaned = raw.strip()
             if cleaned.startswith("```"):
-                lines = cleaned.split("
-")
-                cleaned = "
-".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+                lines = cleaned.split("\n")
+                cleaned = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
             return json.loads(cleaned)
         except json.JSONDecodeError as e:
             logger.error("Failed to parse JSON from state key '%s': %s", field_name, e)
