@@ -1,8 +1,7 @@
 class AppConstants {
   static const appName = 'DAEF';
   static const appTagline = 'Domain-Aware Evaluation Framework';
-  // Physical device via USB: run `adb reverse tcp:8000 tcp:8000` first
-  static const apiBaseUrl = 'http://localhost:8000/api/v1';
+  static const apiBaseUrl = 'http://34.63.118.199:8000/api/v1';
   static const tokenKey = 'auth_token';
   static const themeModeKey = 'theme_mode';
   static const evalPollInterval = Duration(seconds: 5);
