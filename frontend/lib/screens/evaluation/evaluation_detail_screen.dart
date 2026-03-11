@@ -11,7 +11,8 @@ import 'package:daef/widgets/loading_indicator.dart';
 
 class EvaluationDetailScreen extends StatefulWidget {
   final String evaluationId;
-  const EvaluationDetailScreen({required this.evaluationId, super.key});
+  final bool readOnly;
+  const EvaluationDetailScreen({required this.evaluationId, this.readOnly = false, super.key});
 
   @override
   State<EvaluationDetailScreen> createState() => _EvaluationDetailScreenState();
@@ -22,7 +23,11 @@ class _EvaluationDetailScreenState extends State<EvaluationDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EvaluationProvider>().loadDetail(widget.evaluationId);
+      if (widget.readOnly) {
+        context.read<EvaluationProvider>().loadPublic(widget.evaluationId);
+      } else {
+        context.read<EvaluationProvider>().loadDetail(widget.evaluationId);
+      }
     });
   }
 
@@ -87,8 +92,12 @@ class _EvaluationDetailScreenState extends State<EvaluationDetailScreen> {
             description: descCtrl.text.trim().isNotEmpty ? descCtrl.text.trim() : null,
           );
       if (!mounted) return;
+      final socialError = context.read<SocialProvider>().error;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(post != null ? 'Shared to feed!' : 'Failed to share')),
+        SnackBar(
+          content: Text(post != null ? 'Shared to feed!' : socialError ?? 'Failed to share'),
+          backgroundColor: post == null ? Theme.of(context).colorScheme.error : null,
+        ),
       );
     }
   }
@@ -121,13 +130,13 @@ class _EvaluationDetailScreenState extends State<EvaluationDetailScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
-          if (eval.isCompleted)
+          if (eval.isCompleted && !widget.readOnly)
             IconButton(
               icon: const Icon(Icons.share_outlined),
               onPressed: () => _shareEvaluation(eval),
               tooltip: 'Share to Feed',
             ),
-          if (isOwner)
+          if (isOwner && !widget.readOnly)
             PopupMenuButton<String>(
               onSelected: (v) {
                 if (v == 'delete') _deleteEvaluation(eval);
@@ -148,10 +157,12 @@ class _EvaluationDetailScreenState extends State<EvaluationDetailScreen> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => context.read<EvaluationProvider>().loadDetail(widget.evaluationId),
+        onRefresh: () => widget.readOnly
+            ? context.read<EvaluationProvider>().loadPublic(widget.evaluationId)
+            : context.read<EvaluationProvider>().loadDetail(widget.evaluationId),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 56),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

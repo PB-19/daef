@@ -64,6 +64,13 @@ class EvaluationService {
     return Evaluation.fromJson(response.data as Map<String, dynamic>);
   }
 
+  // ── Get shared evaluation (read-only, no ownership required) ────────────────
+
+  Future<Evaluation> getPublic(String id) async {
+    final response = await _client.get('/evaluations/$id/public');
+    return Evaluation.fromJson(response.data as Map<String, dynamic>);
+  }
+
   // ── Delete ────────────────────────────────────────────────────────────────────
 
   Future<void> delete(String id) async {

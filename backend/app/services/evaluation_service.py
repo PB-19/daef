@@ -87,6 +87,29 @@ async def get_evaluation_with_metrics(evaluation_id: str, user_id: str, db: Asyn
     return eval_dict
 
 
+async def get_public_evaluation_with_metrics(evaluation_id: str, db: AsyncSession) -> dict:
+    from app.models.social_post import SocialPost
+    shared = await db.execute(
+        select(SocialPost).where(SocialPost.evaluation_id == evaluation_id)
+    )
+    if not shared.scalar_one_or_none():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evaluation not found or not shared publicly")
+
+    result = await db.execute(select(Evaluation).where(Evaluation.id == evaluation_id))
+    evaluation = result.scalar_one_or_none()
+    if not evaluation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evaluation not found")
+
+    metrics_result = await db.execute(
+        select(EvaluationMetric).where(EvaluationMetric.evaluation_id == evaluation_id)
+    )
+    metrics = list(metrics_result.scalars().all())
+
+    eval_dict = {c.name: getattr(evaluation, c.name) for c in evaluation.__table__.columns}
+    eval_dict["metrics"] = metrics
+    return eval_dict
+
+
 async def delete_evaluation(evaluation_id: str, user_id: str, db: AsyncSession) -> None:
     evaluation = await get_evaluation(evaluation_id, user_id, db)
     await db.delete(evaluation)

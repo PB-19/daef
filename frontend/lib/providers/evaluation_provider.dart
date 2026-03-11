@@ -82,6 +82,18 @@ class EvaluationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> loadPublic(String id) async {
+    _setLoading(true);
+    _error = null;
+    try {
+      _current = await EvaluationService.instance.getPublic(id);
+    } on ApiError catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // ── Create ────────────────────────────────────────────────────────────────────
 
   Future<Evaluation?> create({

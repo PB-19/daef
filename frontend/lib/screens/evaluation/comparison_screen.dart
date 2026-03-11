@@ -105,7 +105,7 @@ class _VersionDetail extends StatelessWidget {
     final perfColor = Helpers.performanceColor(version.performanceChange, context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 56),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

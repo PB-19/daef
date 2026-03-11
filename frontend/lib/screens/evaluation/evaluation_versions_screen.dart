@@ -86,7 +86,7 @@ class _EvaluationVersionsScreenState extends State<EvaluationVersionsScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       itemCount: provider.versions.length,
       itemBuilder: (context, index) {
         final version = provider.versions[index];

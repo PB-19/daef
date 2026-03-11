@@ -122,9 +122,21 @@ class SocialProvider extends ChangeNotifier {
   // ── Like / unlike (optimistic update) ────────────────────────────────────────
 
   Future<void> toggleLike(String postId) async {
-    final idx = _feed.indexWhere((p) => p.id == postId);
+    final feedIdx = _feed.indexWhere((p) => p.id == postId);
+    final topScoreIdx = _topScore.indexWhere((p) => p.id == postId);
+    final topLikedIdx = _topLiked.indexWhere((p) => p.id == postId);
+    final topCommentedIdx = _topCommented.indexWhere((p) => p.id == postId);
     final isCurrentPost = _currentPost?.id == postId;
-    final post = idx != -1 ? _feed[idx] : _currentPost;
+
+    final post = feedIdx != -1
+        ? _feed[feedIdx]
+        : topScoreIdx != -1
+            ? _topScore[topScoreIdx]
+            : topLikedIdx != -1
+                ? _topLiked[topLikedIdx]
+                : topCommentedIdx != -1
+                    ? _topCommented[topCommentedIdx]
+                    : _currentPost;
     if (post == null) return;
 
     final wasLiked = post.isLikedByCurrentUser;
@@ -133,8 +145,11 @@ class SocialProvider extends ChangeNotifier {
       likesCount: wasLiked ? post.likesCount - 1 : post.likesCount + 1,
     );
 
-    // Optimistic update
-    if (idx != -1) _feed = List.from(_feed)..[idx] = updated;
+    // Optimistic update across all lists
+    if (feedIdx != -1) _feed = List.from(_feed)..[feedIdx] = updated;
+    if (topScoreIdx != -1) _topScore = List.from(_topScore)..[topScoreIdx] = updated;
+    if (topLikedIdx != -1) _topLiked = List.from(_topLiked)..[topLikedIdx] = updated;
+    if (topCommentedIdx != -1) _topCommented = List.from(_topCommented)..[topCommentedIdx] = updated;
     if (isCurrentPost) _currentPost = updated;
     notifyListeners();
 
@@ -145,8 +160,11 @@ class SocialProvider extends ChangeNotifier {
         await SocialService.instance.likePost(postId);
       }
     } on ApiError {
-      // Revert on failure
-      if (idx != -1) _feed = List.from(_feed)..[idx] = post;
+      // Revert on failure across all lists
+      if (feedIdx != -1) _feed = List.from(_feed)..[feedIdx] = post;
+      if (topScoreIdx != -1) _topScore = List.from(_topScore)..[topScoreIdx] = post;
+      if (topLikedIdx != -1) _topLiked = List.from(_topLiked)..[topLikedIdx] = post;
+      if (topCommentedIdx != -1) _topCommented = List.from(_topCommented)..[topCommentedIdx] = post;
       if (isCurrentPost) _currentPost = post;
       notifyListeners();
     }
@@ -159,6 +177,7 @@ class SocialProvider extends ChangeNotifier {
     String? title,
     String? description,
   }) async {
+    _error = null;
     try {
       final post = await SocialService.instance.createPost(
         evaluationId: evaluationId,

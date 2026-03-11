@@ -49,6 +49,13 @@ GoRouter createRouter(AuthProvider authProvider) {
         builder: (context, state) => const CreateEvaluationScreen(),
       ),
       GoRoute(
+        path: '/shared/:id',
+        builder: (context, state) => EvaluationDetailScreen(
+          evaluationId: state.pathParameters['id']!,
+          readOnly: true,
+        ),
+      ),
+      GoRoute(
         path: '/evaluations/:id',
         builder: (context, state) => EvaluationDetailScreen(
           evaluationId: state.pathParameters['id']!,

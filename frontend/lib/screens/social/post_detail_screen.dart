@@ -194,7 +194,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           TextButton.icon(
                             icon: const Icon(Icons.open_in_new, size: 16),
                             label: const Text('View Evaluation'),
-                            onPressed: () => context.push('/evaluations/${post.evaluationId}'),
+                            onPressed: () {
+                              if (post.userId == currentUserId) {
+                                context.push('/evaluations/${post.evaluationId}');
+                              } else {
+                                context.push('/shared/${post.evaluationId}');
+                              }
+                            },
                           ),
                         ],
                       ),
@@ -233,7 +239,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 // Comment input
                 Container(
                   padding: EdgeInsets.fromLTRB(
-                      16, 8, 16, MediaQuery.of(context).viewInsets.bottom + 8),
+                      16, 8, 16,
+                      MediaQuery.of(context).viewInsets.bottom +
+                          MediaQuery.of(context).padding.bottom +
+                          8),
                   decoration: BoxDecoration(
                     color: cs.surface,
                     border: Border(top: BorderSide(color: cs.outlineVariant)),

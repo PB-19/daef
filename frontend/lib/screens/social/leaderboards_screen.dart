@@ -50,7 +50,7 @@ class _LeaderboardsScreenState extends State<LeaderboardsScreen>
           tabs: const [
             Tab(text: 'Top Score', icon: Icon(Icons.star_outline, size: 18)),
             Tab(text: 'Most Liked', icon: Icon(Icons.favorite_border, size: 18)),
-            Tab(text: 'Most Discussed', icon: Icon(Icons.chat_bubble_outline, size: 18)),
+            Tab(text: 'Discussed', icon: Icon(Icons.chat_bubble_outline, size: 18)),
           ],
         ),
       ),

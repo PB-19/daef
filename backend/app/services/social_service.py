@@ -43,7 +43,7 @@ async def create_post(data: SocialPostCreate, user_id: str, db: AsyncSession) ->
     await db.flush()
     await db.refresh(post)
     logger.info("Social post created: %s", post.id)
-    return post
+    return await _enrich_post(post, user_id, db)
 
 
 async def _enrich_post(post: SocialPost, current_user_id: str, db: AsyncSession) -> dict:

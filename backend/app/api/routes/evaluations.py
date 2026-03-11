@@ -35,6 +35,15 @@ async def list_evaluations(
     return await evaluation_service.list_evaluations(current_user.id, db, page, page_size, status)
 
 
+@router.get("/{evaluation_id}/public", response_model=EvaluationDetailResponse)
+async def get_public_evaluation(
+    evaluation_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await evaluation_service.get_public_evaluation_with_metrics(evaluation_id, db)
+
+
 @router.get("/{evaluation_id}", response_model=EvaluationDetailResponse)
 async def get_evaluation(
     evaluation_id: str,

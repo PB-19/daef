@@ -288,8 +288,10 @@ class _CreateEvaluationScreenState extends State<CreateEvaluationScreen> {
           ),
 
           // Navigation buttons
-          Padding(
-            padding: const EdgeInsets.all(16),
+          SafeArea(
+            top: false,
+            child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Row(
               children: [
                 if (_step > 0)
@@ -308,6 +310,7 @@ class _CreateEvaluationScreenState extends State<CreateEvaluationScreen> {
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ],
