@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daef"
+version = "0.1.0"
+description = "Domain-Aware Evaluation Framework — intelligent LLM evaluation with domain-specific metrics"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+keywords = ["llm", "evaluation", "ai", "nlp", "rag", "metrics", "google-adk"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "google-adk>=1.0.0",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+]
+
+[project.urls]
+Homepage = "https://github.com/pranavbhimte/daef"
+Issues = "https://github.com/pranavbhimte/daef/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["daef*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
